@@ -1,0 +1,14 @@
+{
+  "name": "vangvida-tobe-app",
+  "version": "1.0.0",
+  "description": "MIS3047 – Ứng dụng hỗ trợ quy trình bán hàng Vang Vida (TO-BE, phạm vi T01–T09)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test",
+    "reset-db": "node --disable-warning=ExperimentalWarning src/reset-db.js"
+  },
+  "engines": { "node": ">=22.13" },
+  "license": "UNLICENSED",
+  "private": true
+}
