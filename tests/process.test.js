@@ -97,3 +97,12 @@ test("Lưu trữ bền vững: dữ liệu còn sau khi mở lại file cơ sở
   assert.equal(P.getOrder(db, id).node, "T03");
   db.close(); fs.unlinkSync(file);
 });
+   test("T05: không duyệt giảm cao hơn mức khách đề nghị", async () => {
+     const { db, kh, nv } = setup();
+     const id = await P.createOrder(db, kh, { type: "Nhẫn", budget: 12000000, gender: "Nam" }, rules);
+     await P.doTask(db, nv, id, "T03", { productId: "VV05", coGiaCong: false }, rules, OPTS);
+     await P.doTask(db, kh, id, "T04", { yeuCauGiamGia: true, requestedDiscount: 2 }, rules, OPTS);
+     await assert.rejects(P.doTask(db, nv, id, "T05", { discountPct: 5 }, rules, OPTS), /mức khách đề nghị/);
+     const o = await P.doTask(db, nv, id, "T05", { discountPct: 2 }, rules, OPTS);
+     assert.equal(o.node, "T08");
+   });
