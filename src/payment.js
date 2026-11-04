@@ -12,12 +12,15 @@ function paymentInfo(order) {
   return { amount, addInfo, purpose: isDeposit ? "Tiền cọc gia công (bước T10)" : "Thanh toán đơn hàng (bước T18)" };
 }
 
+// Ghép đường dẫn ảnh VietQR: mã ngân hàng, số tài khoản, số tiền, nội dung chuyển khoản.
 function buildVietQrUrl(amount, addInfo, bank = cfg.VIETQR) {
   const path = `${encodeURIComponent(bank.bankId)}-${encodeURIComponent(bank.account)}-${encodeURIComponent(bank.template)}.png`;
   const q = new URLSearchParams({ amount: String(Math.round(amount)), addInfo, accountName: bank.accountName });
   return `https://img.vietqr.io/image/${path}?${q}`;
 }
 
+// Máy chủ tải ảnh QR từ VietQR rồi gửi cho giao diện.
+// Ứng dụng chỉ tạo mã, không nhận tiền và không biết khách đã chuyển hay chưa; nhân viên đối soát theo mã đơn.
 async function createPaymentQr(order, { fetchFn = globalThis.fetch, bank = cfg.VIETQR } = {}) {
   const info = paymentInfo(order);
   const base = { ...info, bankId: bank.bankId, account: bank.account, accountName: bank.accountName, demoAccount: bank.demo };
