@@ -72,8 +72,9 @@ const gateways = {
 
 // Tạo mã đơn dạng VV-nămthángngày-số thứ tự, ví dụ VV-261031-0001.
 function makeCode(id, date = new Date()) {
-  const p = n => String(n).padStart(2, "0");
-  return `VV-${String(date.getFullYear()).slice(2)}${p(date.getMonth() + 1)}${p(date.getDate())}-${String(id).padStart(4, "0")}`;
+   const vn = new Date(date.getTime() + 7 * 3600 * 1000);   // đổi sang giờ Việt Nam (UTC+7), máy chủ Render chạy giờ UTC
+   const p = n => String(n).padStart(2, "0");
+   return `VV-${String(vn.getUTCFullYear()).slice(2)}${p(vn.getUTCMonth() + 1)}${p(vn.getUTCDate())}-${String(id).padStart(4, "0")}`;
 }
 
 module.exports = { NODES, LANE_ROLE, validateDiscount, calcQuote, validateDeadline, validPhone, available, gateways, makeCode, round1000, ceil1000 };
