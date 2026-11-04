@@ -103,6 +103,7 @@ const HANDLERS = {
   T05(db, o, d, user) {
     const v = R.validateDiscount(d.discountPct);
     if (!v.ok) throw new BizError(v.error);
+    if (v.value > o.requested_discount) throw new BizError(`Không duyệt cao hơn mức khách đề nghị (${o.requested_discount}%).`);
     updateOrder(db, o.id, { discount_pct: v.value });
     log(db, o.id, "T05", "NV", user.id, `Duyệt giảm ${v.value}% (khách đề nghị ${o.requested_discount}%).`);
     return quoteGateway(db, o);
