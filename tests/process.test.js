@@ -97,7 +97,7 @@ test("Lưu trữ bền vững: dữ liệu còn sau khi mở lại file cơ sở
   assert.equal(P.getOrder(db, id).node, "T03");
   db.close(); fs.unlinkSync(file);
 });
-   test("T05: không duyệt giảm cao hơn mức khách đề nghị", async () => {
+test("T05: không duyệt giảm cao hơn mức khách đề nghị", async () => {
      const { db, kh, nv } = setup();
      const id = await P.createOrder(db, kh, { type: "Nhẫn", budget: 12000000, gender: "Nam" }, rules);
      await P.doTask(db, nv, id, "T03", { productId: "VV05", coGiaCong: false }, rules, OPTS);
@@ -105,4 +105,14 @@ test("Lưu trữ bền vững: dữ liệu còn sau khi mở lại file cơ sở
      await assert.rejects(P.doTask(db, nv, id, "T05", { discountPct: 5 }, rules, OPTS), /mức khách đề nghị/);
      const o = await P.doTask(db, nv, id, "T05", { discountPct: 2 }, rules, OPTS);
      assert.equal(o.node, "T08");
-   });
+});
+test("T08: lịch hẹn nhận hàng phải sau hạn hoàn thành của xưởng", async () => {
+  const { db, kh2, nv, th } = setup();
+  const id = await P.createOrder(db, kh2, { type: "Nhẫn", budget: 20000000, stone: "Emerald" }, rules);
+  await P.doTask(db, nv, id, "T03", { productId: "VV11", coGiaCong: true, customNote: "Khắc tên" }, rules, OPTS);
+  await P.doTask(db, kh2, id, "T04", { yeuCauGiamGia: false }, rules, OPTS);
+  await P.doTask(db, th, id, "T06", { feasible: true, workFee: 800000, workDeadline: "2026-11-07T15:00" }, rules, OPTS);
+  await assert.rejects(P.doTask(db, kh2, id, "T08", { accept: true, appointment: "2026-11-05T09:00" }, rules, OPTS), /sau hạn hoàn thành/);
+  const o = await P.doTask(db, kh2, id, "T08", { accept: true, appointment: "2026-11-07T16:00" }, rules, OPTS);
+  assert.equal(o.node, "CHO_COC");
+});
