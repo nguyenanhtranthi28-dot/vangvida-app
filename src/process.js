@@ -128,6 +128,7 @@ const HANDLERS = {
       return R.gateways.GAccept(false);
     }
     if (o.co_gia_cong && !d.appointment) throw new BizError("Chọn lịch hẹn nhận hàng gia công.");
+    if (o.co_gia_cong && new Date(d.appointment) < new Date(o.work_deadline)) throw new BizError("Lịch hẹn nhận hàng phải sau hạn hoàn thành của xưởng.");
     updateOrder(db, o.id, { appointment: d.appointment || "", contact_channel: d.channel || o.contact_channel });
     log(db, o.id, "T08", "KH", user.id, `Chấp thuận tổng giá ${fmt(o.total)}${d.appointment ? `, hẹn ${d.appointment.replace("T", " ")}` : ""}.`);
     return R.gateways.GAccept(true);
