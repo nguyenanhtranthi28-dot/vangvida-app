@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_Vangvida_TOBE" targetNamespace="https://vangvida.example/tobe" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.31.1">
+  <bpmn:collaboration id="Collaboration_TOBE">
+    <bpmn:participant id="Participant_TOBE" name="Quy trình bán hàng Vangvida — TO-BE" processRef="Process_TOBE" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_TOBE" name="TO-BE Vangvida — 4 lane, 3 vai trò con người, 22 hoạt động" isExecutable="false">
+    <bpmn:documentation>Mục 2.4: 22 hoạt động chính; ba lane con người (khách hàng, nhân viên cửa hàng, bộ phận gia công) và một lane Hệ thống &amp; AI. Bảy tác vụ tự động thuộc lane hệ thống; nhân viên chỉ thực hiện công việc thủ công và các xác nhận trên ứng dụng. Không có lane chủ cửa hàng. Nhân viên chỉ xét giảm tối đa 5%. Hai cổng gia công đọc cùng trường coGiaCong; không bốc xác suất độc lập. Giữ đo ni và gia công thủ công. Không dùng timer chờ cứng sau gia công; thông báo sau kiểm tra đạt và chờ khách thực tế đến. Các sơ đồ ngoại lệ mục 2.3 là tài liệu tham chiếu: lỗi POS tại T09, nhắc quá hạn trong gia công T13 và hủy đơn trước bàn giao. Bản này mô hình hóa luồng chính và các vòng bổ sung cọc/sửa sản phẩm/bổ sung thanh toán; chưa gắn tham số hoặc chạy BIMP TO-BE.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_TOBE">
+      <bpmn:lane id="Lane_workshop" name="Bộ phận gia công">
+        <bpmn:flowNodeRef>T06</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T13</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_system" name="Hệ thống &#38; AI">
+        <bpmn:flowNodeRef>T02</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T09</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T12</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T15</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T17</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T20</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0oyxdav</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_staff" name="Nhân viên cửa hàng">
+        <bpmn:flowNodeRef>T03</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GDiscount</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T05</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JDiscount</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GQuoteCustom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JQuote</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GCustom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T11</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GDeposit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T14</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GQuality</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JGoods</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ANDSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T16</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ANDJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T19</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GPayment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T21</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_customer" name="Khách hàng">
+        <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T01</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T04</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T08</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GAccept</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T10</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndNo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CustomerArrives</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T18</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T22</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndYes</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start" name="Nhu cầu mua trang sức">
+      <bpmn:outgoing>F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="T01" name="T01 · Cung cấp nhu cầu và ngân sách">
+      <bpmn:documentation>Khách cho biết loại trang sức, ngân sách, yêu cầu ni và nhu cầu điều chỉnh nếu đã biết.</bpmn:documentation>
+      <bpmn:incoming>F01</bpmn:incoming>
+      <bpmn:outgoing>F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="T02" name="T02 · AI Agent tra cứu và gợi ý mẫu">
+      <bpmn:documentation>Agent gọi dữ liệu danh mục, giá và tồn kho POS; dùng nhu cầu khách để đề xuất mẫu còn khả dụng hoặc mẫu có thể điều chỉnh. Giá và tồn lấy từ dữ liệu xác thực, không do mô hình ngôn ngữ tự đặt. Lỗi hoặc gợi ý không phù hợp được nhân viên kiểm tra và tra cứu thủ công trong T03.</bpmn:documentation>
+      <bpmn:incoming>F02</bpmn:incoming>
+      <bpmn:outgoing>F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:manualTask id="T04" name="T04 · Thử mẫu, xem giá và đề nghị giảm">
+      <bpmn:documentation>Khách thử mẫu, xem giá niêm yết từ POS và nêu đề nghị giảm giá nếu có.</bpmn:documentation>
+      <bpmn:incoming>F04</bpmn:incoming>
+      <bpmn:outgoing>F05</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="T03" name="T03 · Kiểm tra gợi ý, tư vấn và đo ni">
+      <bpmn:documentation>Nhân viên kiểm tra gợi ý của Agent, tư vấn, đo ni thủ công và đưa mẫu cho khách thử. Gộp các thao tác nhỏ cùng người thực hiện thành một hoạt động; giữ thời gian thao tác thực tế khi so sánh định lượng.</bpmn:documentation>
+      <bpmn:incoming>F03</bpmn:incoming>
+      <bpmn:outgoing>F04</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="GDiscount" name="Khách yêu cầu giảm giá?" gatewayDirection="Diverging">
+      <bpmn:incoming>F05</bpmn:incoming>
+      <bpmn:outgoing>F06</bpmn:outgoing>
+      <bpmn:outgoing>F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="T05" name="T05 · Xét mức giảm trong hạn mức 5%">
+      <bpmn:documentation>Nhân viên quyết định mức giảm từ 0 đến 5% trong thẩm quyền. Không mặc định giảm đủ 5% cho mọi khách. Bản này không mở rộng bước chủ cửa hàng phê duyệt trên 5%; hệ thống không tự duyệt mức vượt quyền.</bpmn:documentation>
+      <bpmn:incoming>F06</bpmn:incoming>
+      <bpmn:outgoing>F08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="JDiscount" name="" gatewayDirection="Converging">
+      <bpmn:incoming>F07</bpmn:incoming>
+      <bpmn:incoming>F08</bpmn:incoming>
+      <bpmn:outgoing>F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="GQuoteCustom" name="Cần gia công thêm?" gatewayDirection="Diverging">
+      <bpmn:incoming>F09</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="JQuote" name="" gatewayDirection="Converging">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ucbzya</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="T06" name="T06 · Xác nhận phí và hạn gia công">
+      <bpmn:documentation>Thợ xem yêu cầu, tình trạng ni và lịch làm việc 08:00–18:00; xác nhận khả năng thực hiện, phí và thời điểm hoàn thành trước khi khách chốt và nộp cọc. Đây là trách nhiệm nghiệp vụ đã xác minh, được làm rõ trong to-be. Giả định luồng này áp dụng cho đơn xưởng có thể nhận; trường hợp không thể nhận xử lý như ngoại lệ/thương lượng lại.</bpmn:documentation>
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:dataObjectReference id="DQuote" name="Báo giá và lịch hẹn" dataObjectRef="DQuote_Object" />
+    <bpmn:dataObject id="DQuote_Object" />
+    <bpmn:userTask id="T08" name="T08 · Chốt tổng giá, lịch hẹn và thông tin">
+      <bpmn:documentation>Khách xem tổng báo giá; xác nhận phương án, lịch hẹn nếu có gia công và thông tin liên hệ/đơn. Chỉ tạo đơn sau khi khách chấp thuận. Các trường thông tin dùng lại để tránh nhân viên nhập lại.</bpmn:documentation>
+      <bpmn:incoming>Flow_1m4b3m4</bpmn:incoming>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GAccept" name="Khách chốt đơn?" gatewayDirection="Diverging">
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+      <bpmn:outgoing>F17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T09" name="T09 · Lưu đơn POS và giữ hàng">
+      <bpmn:documentation>Lưu một lần thông tin khách và đơn được chấp thuận; giữ hàng hoặc hàng nền cần điều chỉnh để hạn chế bán trùng. Dùng mã đơn duy nhất khi đồng bộ và thử lại. Áp dụng xử lý lỗi POS tại mục 2.3 khi triển khai.</bpmn:documentation>
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0ibk0l4">
+        <bpmn:targetRef>DOrder</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataObjectReference id="DOrder" name="Đơn POS / giữ hàng" dataObjectRef="DOrder_Object" />
+    <bpmn:dataObject id="DOrder_Object" />
+    <bpmn:exclusiveGateway id="GCustom" name="Đơn có gia công?" gatewayDirection="Diverging">
+      <bpmn:incoming>F18</bpmn:incoming>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="T10" name="T10 · Thanh toán tiền cọc">
+      <bpmn:documentation>Khách nộp cọc theo phương án đã chấp thuận bằng tiền mặt hoặc QR. Tiền cọc chưa được coi là đã nhận cho đến T11 xác nhận.</bpmn:documentation>
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:incoming>F23</bpmn:incoming>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:endEvent id="EndNo" name="Kết thúc tư vấn / chưa chốt đơn">
+      <bpmn:incoming>F16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="T11" name="T11 · Đối soát và xác nhận tiền cọc">
+      <bpmn:documentation>Nhân viên kiểm tra chứng từ hoặc tiền thực nhận, đúng mã đơn và khoản cọc yêu cầu. Ghi nhận cả lần nộp bổ sung để tránh thu trùng. Chỉ phát lệnh gia công khi đã xác nhận đủ cọc.</bpmn:documentation>
+      <bpmn:incoming>F21</bpmn:incoming>
+      <bpmn:outgoing>F22</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GDeposit" name="Đã nhận đủ cọc?" gatewayDirection="Diverging">
+      <bpmn:incoming>F22</bpmn:incoming>
+      <bpmn:outgoing>F23</bpmn:outgoing>
+      <bpmn:outgoing>F24</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T12" name="T12 · Chuyển phiếu gia công điện tử">
+      <bpmn:documentation>Tự chuyển đúng mã đơn, yêu cầu kỹ thuật, cọc xác nhận và thời hạn do thợ đã thống nhất. Không dùng chuyển phiếu để tự thay đổi giá hoặc lời hẹn. Không cần gọi thợ xuống chỉ để truyền đạt lại thông tin.</bpmn:documentation>
+      <bpmn:incoming>F24</bpmn:incoming>
+      <bpmn:outgoing>F25</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:dataObjectReference id="DWork" name="Phiếu gia công" dataObjectRef="DWork_Object" />
+    <bpmn:dataObject id="DWork_Object" />
+    <bpmn:manualTask id="T13" name="T13 · Gia công và cập nhật hoàn thành">
+      <bpmn:documentation>Thợ thực hiện và cập nhật trạng thái hoàn thành. Thời gian gia công thực tế hiện chốt là 10 giờ/đơn; 3 thợ làm 08:00–18:00. AI không được giả định làm giảm 600 phút lao động này. Khi kiểm tra không đạt thì quay lại xử lý, thời gian làm lại phải đo riêng.</bpmn:documentation>
+      <bpmn:incoming>F25</bpmn:incoming>
+      <bpmn:incoming>F28</bpmn:incoming>
+      <bpmn:outgoing>F26</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="T14" name="T14 · Kiểm tra sản phẩm hoàn thiện">
+      <bpmn:documentation>Nhân viên nhận và kiểm tra ni, mẫu, chất lượng theo yêu cầu đơn. Chỉ hàng đạt mới được thông báo sẵn sàng; hàng không đạt quay về thợ sửa.</bpmn:documentation>
+      <bpmn:incoming>F26</bpmn:incoming>
+      <bpmn:outgoing>F27</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="GQuality" name="Sản phẩm đạt yêu cầu?" gatewayDirection="Diverging">
+      <bpmn:incoming>F27</bpmn:incoming>
+      <bpmn:outgoing>F28</bpmn:outgoing>
+      <bpmn:outgoing>F29</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="T15" name="T15 · Thông báo hàng sẵn sàng cho khách">
+      <bpmn:documentation>Gửi thông báo qua kênh liên hệ đã thống nhất sau khi sản phẩm qua kiểm tra. Thay bước chờ cứng 1 ngày sau gia công; thời gian khách thực tế đến nhận vẫn được giữ ở sự kiện kế tiếp.</bpmn:documentation>
+      <bpmn:incoming>F29</bpmn:incoming>
+      <bpmn:outgoing>F30</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:intermediateCatchEvent id="CustomerArrives" name="Khách đến nhận hàng">
+      <bpmn:documentation>Sự kiện điều kiện: khách đã đến nhận đơn gia công. Có thể phát sinh ngay nếu khách chờ tại cửa hàng; không mặc định khách quay lại ngay khi được nhắn. Không chiếm nhân viên/thợ trong thời gian khách chưa đến.</bpmn:documentation>
+      <bpmn:incoming>F30</bpmn:incoming>
+      <bpmn:outgoing>F31</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition id="Condition_CustomerArrives">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">khachDaDenNhanHang = true</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="JGoods" name="" gatewayDirection="Converging">
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:incoming>F31</bpmn:incoming>
+      <bpmn:outgoing>F32</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:parallelGateway id="ANDSplit" name="" gatewayDirection="Diverging">
+      <bpmn:incoming>F32</bpmn:incoming>
+      <bpmn:outgoing>F33</bpmn:outgoing>
+      <bpmn:outgoing>F34</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="T17" name="T17 · Chuẩn bị hóa đơn từ đơn POS">
+      <bpmn:documentation>Hệ thống tạo dự thảo/chứng từ thanh toán từ dữ liệu đơn; chưa đánh dấu đã thanh toán. Hoạt động này độc lập với đóng gói. Chứng từ chính thức được chốt ở T20 sau đối soát.</bpmn:documentation>
+      <bpmn:incoming>F34</bpmn:incoming>
+      <bpmn:outgoing>F36</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:manualTask id="T16" name="T16 · Đóng gói sản phẩm">
+      <bpmn:documentation>Nhân viên đóng gói khi hàng có sẵn hoặc hàng gia công đã sẵn sàng. Thực hiện song song với hệ thống chuẩn bị hóa đơn, không giả định cùng một nhân viên làm hai thao tác thủ công đồng thời.</bpmn:documentation>
+      <bpmn:incoming>F33</bpmn:incoming>
+      <bpmn:outgoing>F35</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:parallelGateway id="ANDJoin" name="" gatewayDirection="Converging">
+      <bpmn:incoming>F35</bpmn:incoming>
+      <bpmn:incoming>F36</bpmn:incoming>
+      <bpmn:outgoing>F37</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:manualTask id="T18" name="T18 · Thanh toán số tiền còn lại">
+      <bpmn:documentation>Thanh toán phần còn phải trả sau khi trừ cọc đã xác nhận. Nếu số dư bằng 0 thì xác nhận đã thanh toán đủ, không thu thêm.</bpmn:documentation>
+      <bpmn:incoming>F37</bpmn:incoming>
+      <bpmn:incoming>F40</bpmn:incoming>
+      <bpmn:outgoing>F38</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:userTask id="T19" name="T19 · Đối soát và xác nhận thanh toán">
+      <bpmn:documentation>Kiểm tra mã đơn, số tiền thực thu và chứng từ tiền mặt/QR. Với tiền mặt tính cả tiền trả lại; với QR kiểm tra số tiền được ghi nhận. Sai hoặc thiếu tiền quay lại khách bổ sung, chưa bàn giao hàng.</bpmn:documentation>
+      <bpmn:incoming>F38</bpmn:incoming>
+      <bpmn:outgoing>F39</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="GPayment" name="Đã nhận đúng số tiền?" gatewayDirection="Diverging">
+      <bpmn:incoming>F39</bpmn:incoming>
+      <bpmn:outgoing>F40</bpmn:outgoing>
+      <bpmn:outgoing>F41</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T20" name="T20 · Chốt đơn, kho và báo cáo tự động">
+      <bpmn:documentation>Sau xác nhận thanh toán, chuyển đơn sang đã thanh toán, chốt xuất kho từ hàng đã giữ, ghi nhận cọc để không trừ hai lần, phát hành/gửi chứng từ theo chính sách cửa hàng và cập nhật báo cáo nội bộ từ dữ liệu giao dịch. Thay chụp ảnh gửi thủ công; các cập nhật cần nhất quán và thử lại không tạo trùng.</bpmn:documentation>
+      <bpmn:incoming>F41</bpmn:incoming>
+      <bpmn:outgoing>F42</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_19n72n5">
+        <bpmn:targetRef>DReport</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:dataObjectReference id="DReport" name="Giao dịch và báo cáo" dataObjectRef="DReport_Object" />
+    <bpmn:dataObject id="DReport_Object" />
+    <bpmn:manualTask id="T21" name="T21 · Kiểm tra và bàn giao sản phẩm">
+      <bpmn:documentation>Kiểm tra khớp mã đơn, sản phẩm và trạng thái thanh toán; bàn giao hàng cho khách.</bpmn:documentation>
+      <bpmn:incoming>F42</bpmn:incoming>
+      <bpmn:outgoing>F43</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="T22" name="T22 · Kiểm tra và nhận sản phẩm">
+      <bpmn:documentation>Khách đối chiếu sản phẩm và nhận hàng/chứng từ. Hoàn tất đơn sau bàn giao.</bpmn:documentation>
+      <bpmn:incoming>F43</bpmn:incoming>
+      <bpmn:outgoing>F44</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:endEvent id="EndYes" name="Hoàn tất mua hàng">
+      <bpmn:incoming>F44</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F01" name="" sourceRef="Start" targetRef="T01" />
+    <bpmn:sequenceFlow id="F02" name="" sourceRef="T01" targetRef="T02" />
+    <bpmn:sequenceFlow id="F03" name="" sourceRef="T02" targetRef="T03" />
+    <bpmn:sequenceFlow id="F04" name="" sourceRef="T03" targetRef="T04" />
+    <bpmn:sequenceFlow id="F05" name="" sourceRef="T04" targetRef="GDiscount" />
+    <bpmn:sequenceFlow id="F06" name="Có" sourceRef="GDiscount" targetRef="T05">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">yeuCauGiamGia = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F07" name="Không" sourceRef="GDiscount" targetRef="JDiscount">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">yeuCauGiamGia = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F08" name="" sourceRef="T05" targetRef="JDiscount" />
+    <bpmn:sequenceFlow id="F09" name="" sourceRef="JDiscount" targetRef="GQuoteCustom" />
+    <bpmn:sequenceFlow id="F10" name="Có" sourceRef="GQuoteCustom" targetRef="T06">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">coGiaCong = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F11" name="Không" sourceRef="GQuoteCustom" targetRef="JQuote">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">coGiaCong = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F12" name="" sourceRef="T06" targetRef="JQuote" />
+    <bpmn:sequenceFlow id="F15" name="" sourceRef="T08" targetRef="GAccept" />
+    <bpmn:sequenceFlow id="F16" name="Không" sourceRef="GAccept" targetRef="EndNo">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">khachChapThuan = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F17" name="Có" sourceRef="GAccept" targetRef="T09">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">khachChapThuan = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F18" name="" sourceRef="T09" targetRef="GCustom" />
+    <bpmn:sequenceFlow id="F19" name="Không — hàng có sẵn" sourceRef="GCustom" targetRef="JGoods">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">coGiaCong = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F20" name="Có" sourceRef="GCustom" targetRef="T10">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">coGiaCong = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F23" name="Chưa đủ" sourceRef="GDeposit" targetRef="T10">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">cocDaNhan &lt; cocYeuCau</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F21" name="" sourceRef="T10" targetRef="T11" />
+    <bpmn:sequenceFlow id="F22" name="" sourceRef="T11" targetRef="GDeposit" />
+    <bpmn:sequenceFlow id="F24" name="Đủ" sourceRef="GDeposit" targetRef="T12">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">cocDaNhan &gt;= cocYeuCau</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F25" name="" sourceRef="T12" targetRef="T13" />
+    <bpmn:sequenceFlow id="F28" name="Chưa đạt" sourceRef="GQuality" targetRef="T13">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">kiemTraDat = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F26" name="" sourceRef="T13" targetRef="T14" />
+    <bpmn:sequenceFlow id="F27" name="" sourceRef="T14" targetRef="GQuality" />
+    <bpmn:sequenceFlow id="F29" name="Đạt" sourceRef="GQuality" targetRef="T15">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">kiemTraDat = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F30" name="" sourceRef="T15" targetRef="CustomerArrives" />
+    <bpmn:sequenceFlow id="F31" name="" sourceRef="CustomerArrives" targetRef="JGoods" />
+    <bpmn:sequenceFlow id="F32" name="" sourceRef="JGoods" targetRef="ANDSplit" />
+    <bpmn:sequenceFlow id="F33" name="" sourceRef="ANDSplit" targetRef="T16" />
+    <bpmn:sequenceFlow id="F34" name="" sourceRef="ANDSplit" targetRef="T17" />
+    <bpmn:sequenceFlow id="F36" name="" sourceRef="T17" targetRef="ANDJoin" />
+    <bpmn:sequenceFlow id="F35" name="" sourceRef="T16" targetRef="ANDJoin" />
+    <bpmn:sequenceFlow id="F37" name="" sourceRef="ANDJoin" targetRef="T18" />
+    <bpmn:sequenceFlow id="F40" name="Chưa đúng / thiếu" sourceRef="GPayment" targetRef="T18">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">thanhToanHopLe = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F38" name="" sourceRef="T18" targetRef="T19" />
+    <bpmn:sequenceFlow id="F39" name="" sourceRef="T19" targetRef="GPayment" />
+    <bpmn:sequenceFlow id="F41" name="Đúng" sourceRef="GPayment" targetRef="T20">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">thanhToanHopLe = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F42" name="" sourceRef="T20" targetRef="T21" />
+    <bpmn:sequenceFlow id="F43" name="" sourceRef="T21" targetRef="T22" />
+    <bpmn:sequenceFlow id="F44" name="" sourceRef="T22" targetRef="EndYes" />
+    <bpmn:userTask id="Activity_0oyxdav" name="T06 · Tính và báo giá">
+      <bpmn:documentation>Thợ xem yêu cầu, tình trạng ni và lịch làm việc 08:00–18:00; xác nhận khả năng thực hiện, phí và thời điểm hoàn thành trước khi khách chốt và nộp cọc. Đây là trách nhiệm nghiệp vụ đã xác minh, được làm rõ trong to-be. Giả định luồng này áp dụng cho đơn xưởng có thể nhận; trường hợp không thể nhận xử lý như ngoại lệ/thương lượng lại.</bpmn:documentation>
+      <bpmn:incoming>Flow_0ucbzya</bpmn:incoming>
+      <bpmn:outgoing>Flow_1m4b3m4</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_127vdgp">
+        <bpmn:targetRef>DQuote</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0ucbzya" sourceRef="JQuote" targetRef="Activity_0oyxdav" />
+    <bpmn:sequenceFlow id="Flow_1m4b3m4" sourceRef="Activity_0oyxdav" targetRef="T08" />
+    <bpmn:association id="DWork_Association" associationDirection="One" sourceRef="T12" targetRef="DWork" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_TOBE">
+    <bpmndi:BPMNPlane id="Plane_TOBE" bpmnElement="Collaboration_TOBE">
+      <bpmndi:BPMNShape id="Participant_TOBE_di" bpmnElement="Participant_TOBE" isHorizontal="true">
+        <dc:Bounds x="155" y="80" width="6105" height="1030" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_customer_di" bpmnElement="Lane_customer" isHorizontal="true">
+        <dc:Bounds x="195" y="80" width="6065" height="260" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_staff_di" bpmnElement="Lane_staff" isHorizontal="true">
+        <dc:Bounds x="195" y="340" width="6065" height="270" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_system_di" bpmnElement="Lane_system" isHorizontal="true">
+        <dc:Bounds x="195" y="610" width="6065" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_workshop_di" bpmnElement="Lane_workshop" isHorizontal="true">
+        <dc:Bounds x="195" y="860" width="6065" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start">
+        <dc:Bounds x="300" y="169" width="42" height="42" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="232" y="219" width="180" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T01_di" bpmnElement="T01">
+        <dc:Bounds x="400" y="140" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T02_di" bpmnElement="T02">
+        <dc:Bounds x="400" y="680" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T04_di" bpmnElement="T04">
+        <dc:Bounds x="690" y="140" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T03_di" bpmnElement="T03">
+        <dc:Bounds x="690" y="420" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDiscount_di" bpmnElement="GDiscount" isMarkerVisible="true">
+        <dc:Bounds x="1053" y="443" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="983" y="507" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T05_di" bpmnElement="T05">
+        <dc:Bounds x="1170" y="420" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JDiscount_di" bpmnElement="JDiscount" isMarkerVisible="true">
+        <dc:Bounds x="1463" y="443" width="54" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GQuoteCustom_di" bpmnElement="GQuoteCustom" isMarkerVisible="true">
+        <dc:Bounds x="1583" y="443" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1647" y="463" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JQuote_di" bpmnElement="JQuote" isMarkerVisible="true">
+        <dc:Bounds x="1903" y="443" width="54" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T06_di" bpmnElement="T06">
+        <dc:Bounds x="1670" y="940" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DQuote_di" bpmnElement="DQuote">
+        <dc:Bounds x="2178" y="510" width="44" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2106" y="486" width="188" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T08_di" bpmnElement="T08">
+        <dc:Bounds x="2260" y="160" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GAccept_di" bpmnElement="GAccept" isMarkerVisible="true">
+        <dc:Bounds x="2583" y="183" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2647" y="203" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T09_di" bpmnElement="T09">
+        <dc:Bounds x="2500" y="640" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DOrder_di" bpmnElement="DOrder">
+        <dc:Bounds x="2678" y="510" width="44" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2606" y="486" width="188" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GCustom_di" bpmnElement="GCustom" isMarkerVisible="true">
+        <dc:Bounds x="2833" y="453" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2833" y="450" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T10_di" bpmnElement="T10">
+        <dc:Bounds x="2750" y="200" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndNo_di" bpmnElement="EndNo">
+        <dc:Bounds x="2709" y="90" width="42" height="42" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2640" y="140" width="180" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T11_di" bpmnElement="T11">
+        <dc:Bounds x="3010" y="400" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDeposit_di" bpmnElement="GDeposit" isMarkerVisible="true">
+        <dc:Bounds x="3293" y="423" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3303" y="443" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T12_di" bpmnElement="T12">
+        <dc:Bounds x="3210" y="710" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DWork_di" bpmnElement="DWork">
+        <dc:Bounds x="3298" y="903" width="44" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3226" y="967" width="188" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T13_di" bpmnElement="T13">
+        <dc:Bounds x="3420" y="910" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T14_di" bpmnElement="T14">
+        <dc:Bounds x="3600" y="400" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GQuality_di" bpmnElement="GQuality" isMarkerVisible="true">
+        <dc:Bounds x="3900" y="423" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3830" y="393" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T15_di" bpmnElement="T15">
+        <dc:Bounds x="4150" y="640" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CustomerArrives_di" bpmnElement="CustomerArrives">
+        <dc:Bounds x="4329" y="229" width="42" height="42" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4260" y="205" width="180" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JGoods_di" bpmnElement="JGoods" isMarkerVisible="true">
+        <dc:Bounds x="4433" y="423" width="54" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ANDSplit_di" bpmnElement="ANDSplit">
+        <dc:Bounds x="4593" y="423" width="54" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T17_di" bpmnElement="T17">
+        <dc:Bounds x="4510" y="700" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T16_di" bpmnElement="T16">
+        <dc:Bounds x="4750" y="400" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ANDJoin_di" bpmnElement="ANDJoin">
+        <dc:Bounds x="5093" y="423" width="54" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T18_di" bpmnElement="T18">
+        <dc:Bounds x="5190" y="140" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T19_di" bpmnElement="T19">
+        <dc:Bounds x="5190" y="370" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GPayment_di" bpmnElement="GPayment" isMarkerVisible="true">
+        <dc:Bounds x="5533" y="393" width="54" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5553" y="413" width="194" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T20_di" bpmnElement="T20">
+        <dc:Bounds x="5450" y="660" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DReport_di" bpmnElement="DReport">
+        <dc:Bounds x="5608" y="510" width="44" height="54" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5578" y="486" width="104" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T21_di" bpmnElement="T21">
+        <dc:Bounds x="5780" y="430" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T22_di" bpmnElement="T22">
+        <dc:Bounds x="5780" y="160" width="220" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndYes_di" bpmnElement="EndYes">
+        <dc:Bounds x="6109" y="189" width="42" height="42" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="6041" y="239" width="180" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0qom60q" bpmnElement="Activity_0oyxdav">
+        <dc:Bounds x="2090" y="680" width="220" height="100" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01">
+        <di:waypoint x="342" y="190" />
+        <di:waypoint x="400" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02">
+        <di:waypoint x="510" y="240" />
+        <di:waypoint x="510" y="680" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03">
+        <di:waypoint x="620" y="730" />
+        <di:waypoint x="800" y="730" />
+        <di:waypoint x="800" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_di" bpmnElement="F04">
+        <di:waypoint x="800" y="420" />
+        <di:waypoint x="800" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_di" bpmnElement="F05">
+        <di:waypoint x="910" y="190" />
+        <di:waypoint x="970" y="190" />
+        <di:waypoint x="970" y="470" />
+        <di:waypoint x="1053" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_di" bpmnElement="F06">
+        <di:waypoint x="1107" y="470" />
+        <di:waypoint x="1170" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1077" y="450" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07_di" bpmnElement="F07">
+        <di:waypoint x="1080" y="443" />
+        <di:waypoint x="1080" y="360" />
+        <di:waypoint x="1490" y="360" />
+        <di:waypoint x="1490" y="443" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1243" y="343" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_di" bpmnElement="F08">
+        <di:waypoint x="1390" y="470" />
+        <di:waypoint x="1463" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_di" bpmnElement="F09">
+        <di:waypoint x="1517" y="470" />
+        <di:waypoint x="1583" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1610" y="497" />
+        <di:waypoint x="1610" y="990" />
+        <di:waypoint x="1670" y="990" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1570" y="588" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1610" y="443" />
+        <di:waypoint x="1610" y="360" />
+        <di:waypoint x="1930" y="360" />
+        <di:waypoint x="1930" y="443" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1700" y="343" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="1890" y="990" />
+        <di:waypoint x="1930" y="990" />
+        <di:waypoint x="1930" y="497" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15">
+        <di:waypoint x="2480" y="210" />
+        <di:waypoint x="2583" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16">
+        <di:waypoint x="2610" y="183" />
+        <di:waypoint x="2610" y="111" />
+        <di:waypoint x="2709" y="111" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2613" y="83" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17">
+        <di:waypoint x="2610" y="237" />
+        <di:waypoint x="2610" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2547" y="573" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18">
+        <di:waypoint x="2720" y="690" />
+        <di:waypoint x="2780" y="690" />
+        <di:waypoint x="2780" y="480" />
+        <di:waypoint x="2833" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19">
+        <di:waypoint x="2860" y="507" />
+        <di:waypoint x="2860" y="1050" />
+        <di:waypoint x="4460" y="1050" />
+        <di:waypoint x="4460" y="477" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2802" y="1023" width="209" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20">
+        <di:waypoint x="2860" y="453" />
+        <di:waypoint x="2860" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2825" y="334" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_di" bpmnElement="F23">
+        <di:waypoint x="3320" y="423" />
+        <di:waypoint x="3320" y="110" />
+        <di:waypoint x="2860" y="110" />
+        <di:waypoint x="2860" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3300" y="254" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21">
+        <di:waypoint x="2970" y="250" />
+        <di:waypoint x="3120" y="250" />
+        <di:waypoint x="3120" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22_di" bpmnElement="F22">
+        <di:waypoint x="3230" y="450" />
+        <di:waypoint x="3293" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_di" bpmnElement="F24">
+        <di:waypoint x="3320" y="477" />
+        <di:waypoint x="3320" y="710" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3290" y="665" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25_di" bpmnElement="F25">
+        <di:waypoint x="3430" y="760" />
+        <di:waypoint x="3530" y="760" />
+        <di:waypoint x="3530" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28_di" bpmnElement="F28">
+        <di:waypoint x="3927" y="477" />
+        <di:waypoint x="3927" y="960" />
+        <di:waypoint x="3640" y="960" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3910" y="553" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F26_di" bpmnElement="F26">
+        <di:waypoint x="3560" y="910" />
+        <di:waypoint x="3560" y="450" />
+        <di:waypoint x="3600" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F27_di" bpmnElement="F27">
+        <di:waypoint x="3820" y="450" />
+        <di:waypoint x="3900" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F29_di" bpmnElement="F29">
+        <di:waypoint x="3954" y="450" />
+        <di:waypoint x="4080" y="450" />
+        <di:waypoint x="4080" y="690" />
+        <di:waypoint x="4150" y="690" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3960" y="423" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F30_di" bpmnElement="F30">
+        <di:waypoint x="4260" y="640" />
+        <di:waypoint x="4260" y="250" />
+        <di:waypoint x="4329" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F31_di" bpmnElement="F31">
+        <di:waypoint x="4371" y="250" />
+        <di:waypoint x="4460" y="250" />
+        <di:waypoint x="4460" y="423" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F32_di" bpmnElement="F32">
+        <di:waypoint x="4487" y="450" />
+        <di:waypoint x="4593" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F33_di" bpmnElement="F33">
+        <di:waypoint x="4647" y="450" />
+        <di:waypoint x="4750" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F34_di" bpmnElement="F34">
+        <di:waypoint x="4620" y="477" />
+        <di:waypoint x="4620" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F36_di" bpmnElement="F36">
+        <di:waypoint x="4730" y="750" />
+        <di:waypoint x="5120" y="750" />
+        <di:waypoint x="5120" y="477" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F35_di" bpmnElement="F35">
+        <di:waypoint x="4970" y="450" />
+        <di:waypoint x="5093" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F37_di" bpmnElement="F37">
+        <di:waypoint x="5120" y="423" />
+        <di:waypoint x="5120" y="190" />
+        <di:waypoint x="5190" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F40_di" bpmnElement="F40">
+        <di:waypoint x="5560" y="393" />
+        <di:waypoint x="5560" y="110" />
+        <di:waypoint x="5300" y="110" />
+        <di:waypoint x="5300" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5416" y="263" width="187" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F38_di" bpmnElement="F38">
+        <di:waypoint x="5300" y="240" />
+        <di:waypoint x="5300" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F39_di" bpmnElement="F39">
+        <di:waypoint x="5410" y="420" />
+        <di:waypoint x="5533" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F41_di" bpmnElement="F41">
+        <di:waypoint x="5560" y="447" />
+        <di:waypoint x="5560" y="660" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5490" y="473" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F42_di" bpmnElement="F42">
+        <di:waypoint x="5670" y="710" />
+        <di:waypoint x="5890" y="710" />
+        <di:waypoint x="5890" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F43_di" bpmnElement="F43">
+        <di:waypoint x="5890" y="430" />
+        <di:waypoint x="5890" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F44_di" bpmnElement="F44">
+        <di:waypoint x="6000" y="210" />
+        <di:waypoint x="6109" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DWork_Association_di" bpmnElement="DWork_Association">
+        <di:waypoint x="3320" y="810" />
+        <di:waypoint x="3320" y="903" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ucbzya_di" bpmnElement="Flow_0ucbzya">
+        <di:waypoint x="1957" y="470" />
+        <di:waypoint x="2010" y="470" />
+        <di:waypoint x="2010" y="730" />
+        <di:waypoint x="2090" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1m4b3m4_di" bpmnElement="Flow_1m4b3m4">
+        <di:waypoint x="2310" y="730" />
+        <di:waypoint x="2370" y="730" />
+        <di:waypoint x="2370" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0ibk0l4_di" bpmnElement="DataOutputAssociation_0ibk0l4">
+        <di:waypoint x="2700" y="640" />
+        <di:waypoint x="2700" y="580" />
+        <di:waypoint x="2700" y="564" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_19n72n5_di" bpmnElement="DataOutputAssociation_19n72n5">
+        <di:waypoint x="5630" y="660" />
+        <di:waypoint x="5630" y="640" />
+        <di:waypoint x="5630" y="564" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_127vdgp_di" bpmnElement="DataOutputAssociation_127vdgp">
+        <di:waypoint x="2200" y="680" />
+        <di:waypoint x="2200" y="564" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
