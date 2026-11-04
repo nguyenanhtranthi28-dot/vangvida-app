@@ -1,6 +1,7 @@
 // LUẬT NGHIỆP VỤ — các hàm thuần (không đụng cơ sở dữ liệu), được kiểm thử trong tests/rules.test.js
 const cfg = require("./config");
 
+// Làm tròn tiền đến hàng nghìn: round1000 làm tròn gần nhất (tiền giảm), ceil1000 làm tròn lên (tiền cọc).
 const round1000 = n => Math.round(n / 1000) * 1000;
 const ceil1000 = n => Math.ceil(n / 1000) * 1000;
 
@@ -20,6 +21,8 @@ const NODES = {
   T09: { name: "Lưu đơn POS và giữ hàng", lane: "HT", kind: "service" }
 };
 
+// T05: kiểm tra mức giảm nhân viên nhập: phải là số, không âm, không vượt MAX_DISCOUNT (5%).
+// Vượt hạn mức thì báo lỗi; không có bước chuyển chủ cửa hàng duyệt (đúng mô hình TO-BE).
 function validateDiscount(pct) {
   if (pct === "" || pct === null || pct === undefined || isNaN(pct)) return { ok: false, error: `Nhập mức giảm từ 0 đến ${cfg.MAX_DISCOUNT}%.` };
   pct = Number(pct);
@@ -29,15 +32,18 @@ function validateDiscount(pct) {
 }
 
 // T07: tổng = giá POS − giảm (chỉ trên giá hàng) + phí gia công (không giảm phí)
+// Ví dụ: giá 18.500.000, giảm 3% = 555.000, phí 800.000 → tổng 18.745.000; cọc 30% = 5.624.000.
 function calcQuote({ price, discountPct = 0, fee = 0, coGiaCong = false, depositRate = cfg.DEPOSIT_RATE }) {
   const discountAmt = round1000(price * discountPct / 100);
   const workFee = coGiaCong ? fee : 0;
   const total = price - discountAmt + workFee;
+  // Chỉ đơn có gia công mới phải đặt cọc; hàng có sẵn thì tiền cọc bằng 0.
   const depositRequired = coGiaCong ? ceil1000(total * depositRate / 100) : 0;
   return { listPrice: price, discountPct, discountAmt, fee: workFee, total, depositRequired };
 }
 
 // T06: hạn hoàn thành trong giờ làm của xưởng
+// Hạn thợ đưa ra phải nằm trong giờ làm 08:00–18:00 và phải sau thời điểm hiện tại.
 function validateDeadline(str, now = null) {
   if (!str) return { ok: false, error: "Chọn thời điểm hoàn thành." };
   const d = new Date(str);
@@ -48,16 +54,23 @@ function validateDeadline(str, now = null) {
   return { ok: true };
 }
 
+// validPhone: số điện thoại 10 số, bắt đầu bằng 0.
+// available: số hàng còn bán được = tồn kho − số đã giữ cho các đơn khác.
 const validPhone = p => /^0\d{9}$/.test(String(p || "").replace(/\s/g, ""));
 const available = p => (p.stock || 0) - (p.reserved || 0);
 
 // Các cổng XOR — viết thành hàm riêng để dễ đối chiếu với điều kiện trong file .bpmn
 const gateways = {
+  // Mỗi hàm nhận dữ liệu đơn và trả về tên bước tiếp theo, giống mũi tên đi ra khỏi cổng trong BPMN.
+  // Cổng 1 “Khách yêu cầu giảm giá?”: có → T05 (nhân viên xét giảm), không → sang cổng 2.
   GDiscount: o => (o.yeu_cau_giam_gia ? "T05" : "GQuoteCustom"),     // yeuCauGiamGia = true / false
+  // Cổng 2 “Cần gia công thêm?”: có → T06 (thợ xác nhận phí, hạn), không → T07 (máy tính báo giá).
   GQuoteCustom: o => (o.co_gia_cong ? "T06" : "T07"),                // coGiaCong = true / false
+  // Cổng 3 “Khách chốt đơn?”: có → T09 (lưu đơn), không → kết thúc, đơn ghi là không thành công.
   GAccept: accept => (accept ? "T09" : "EndNo")                      // khachChapThuan = true / false
 };
 
+// Tạo mã đơn dạng VV-nămthángngày-số thứ tự, ví dụ VV-261031-0001.
 function makeCode(id, date = new Date()) {
   const p = n => String(n).padStart(2, "0");
   return `VV-${String(date.getFullYear()).slice(2)}${p(date.getMonth() + 1)}${p(date.getDate())}-${String(id).padStart(4, "0")}`;
