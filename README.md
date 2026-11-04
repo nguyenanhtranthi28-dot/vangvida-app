@@ -57,8 +57,8 @@ Mỗi vai trò mở ở một trình duyệt hoặc cửa sổ ẩn danh riêng.
 npm test
 ```
 
-Chạy 30 test: luật nghiệp vụ, động cơ quy trình, phân quyền theo lane, API, đăng ký, lưu trữ và hai tích hợp bên ngoài. Kết quả mong đợi: 30/30 đạt.
-
+Chạy 32 test: luật nghiệp vụ, động cơ quy trình, phân quyền theo lane, API, đăng ký, lưu trữ và hai tích hợp bên ngoài. Kết quả mong đợi: 32/32 đạt.
+**Kiểm tra bộ test có bắt được lỗi không:** mở `src/config.js`, đổi `MAX_DISCOUNT: 5` thành `MAX_DISCOUNT: 10`, chạy `npm test`. Hai test về hạn mức giảm sẽ báo lỗi (`fail 2`). Đổi lại `5` thì tất cả đạt. Không commit lần đổi thử này.
 ## 4. Cấu trúc mã nguồn
 
 ```
