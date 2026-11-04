@@ -1,22 +1,10 @@
-# Vang Vida – Ứng dụng tư vấn và báo giá (MIS3047)
+# Vang Vida – Ứng dụng tư vấn và báo giá
+## 1. Dùng thử web
 
-Ứng dụng web hỗ trợ giai đoạn **tư vấn → báo giá → chốt đơn (T01–T09)** của quy trình bán hàng TO-BE tại Vang Vida Jewelry.
-Viết bằng Node.js thuần, **không cần cài thư viện** (không có `npm install`).
+Bản chạy trực tuyến: **https://vangvida-app.onrender.com**
+Lần mở đầu có thể chờ khoảng 1 phút vì gói miễn phí tạm ngủ khi không có người dùng. Dữ liệu tạo trên bản này sẽ mất khi máy chủ khởi động lại; muốn kiểm tra lưu trữ bền vững, hãy chạy trên máy (mục 2).
 
-## 1. Chạy ứng dụng trong VS Code
-
-1. Cài **Node.js bản 22.13 trở lên** (khuyên dùng bản LTS mới nhất) tại https://nodejs.org. Kiểm tra: mở terminal, gõ `node -v`.
-2. Giải nén thư mục `vangvida-app`, mở VS Code → **File → Open Folder** → chọn thư mục này.
-3. Mở terminal trong VS Code: **Terminal → New Terminal**.
-4. Gõ lệnh:
-   ```
-   npm start
-   ```
-5. Mở trình duyệt vào **http://localhost:3000**. Muốn dừng máy chủ: bấm `Ctrl + C` trong terminal.
-
-**Khách hàng mới:** ở trang đăng nhập bấm “Đăng ký”, nhập họ tên, số điện thoại, tên đăng nhập, mật khẩu (ít nhất 8 ký tự). Đăng ký xong được đăng nhập luôn. Trang đăng ký chỉ tạo được tài khoản khách hàng; tài khoản nhân viên và thợ do cửa hàng cấp sẵn.
-
-Tài khoản demo (mật khẩu chung `vangvida123`):
+Tài khoản demo, mật khẩu chung `vangvida123`:
 
 | Tài khoản | Vai trò | Lane BPMN |
 |---|---|---|
@@ -24,88 +12,90 @@ Tài khoản demo (mật khẩu chung `vangvida123`):
 | nhanvien1 | Nhân viên cửa hàng | Nhân viên cửa hàng |
 | tho1 | Thợ gia công | Bộ phận gia công |
 
-Các lệnh khác:
-- `npm test` — chạy toàn bộ kiểm thử tự động.
-- `npm run reset-db` — xóa dữ liệu, tạo lại dữ liệu mẫu.
+Khách hàng mới có thể tự đăng ký ở trang đăng nhập. Trang đăng ký chỉ tạo tài khoản khách hàng; tài khoản nhân viên và thợ do cửa hàng cấp.
 
-### Tích hợp bên ngoài
-Ứng dụng có **2 tích hợp bên ngoài**:
-1. **VietQR (chạy ngay, không cần khóa):** sau khi khách chốt đơn (T09), mở đơn và bấm “Tạo mã QR chuyển khoản”. Máy chủ gọi dịch vụ `img.vietqr.io` để tạo mã QR cọc (đơn gia công) hoặc QR thanh toán (hàng có sẵn), nội dung chuyển khoản chứa mã đơn để đối soát. Mặc định dùng **tài khoản demo không có thật**; muốn dùng tài khoản thật thì khai báo `VIETQR_ACCOUNT` trong `.env`.
-2. **Anthropic Claude API (cần khóa):** dùng cho AI gợi ý mẫu ở T02, xem mục dưới.
+### Kịch bản chính của nhóm (nhánh có giảm giá và gia công)
+Mỗi vai trò mở ở một trình duyệt hoặc cửa sổ ẩn danh riêng.
 
-### Bật AI thật (tùy chọn)
-Sao chép `.env.example` thành `.env`, điền `ANTHROPIC_API_KEY=...`, rồi chạy lại `npm start`.
-Không có khóa thì T02 dùng **luật dự phòng**, ứng dụng vẫn chạy đầy đủ. **Không commit file `.env` lên Git** (đã có trong `.gitignore`).
+| Bước | Tài khoản | Thao tác | Kết quả đúng |
+|---|---|---|---|
+| T01 | khach1 | Tạo yêu cầu: Nhẫn, ngân sách 20.000.000, đá Emerald, giới tính Nữ | Đơn được tạo, chuyển sang T03 |
+| T02 | (tự động) | Hệ thống gợi ý mẫu | Danh sách gợi ý kèm độ tin cậy, có VV11 Nhẫn Nữ EMERALD |
+| T03 | nhanvien1 | Chọn VV11, nhập ni đo, **tích "cần gia công"**, ghi yêu cầu "Khắc tên" | Chuyển sang T04 |
+| T04 | khach1 | Đề nghị giảm 5% | Cổng giảm giá → T05 |
+| T05 | nhanvien1 | Duyệt giảm 3% | Cổng gia công → T06 |
+| T06 | tho1 | Nhận làm, phí 800.000, hạn trong giờ 08:00–18:00 của ngày sau | Chuyển sang T07 |
+| T07 | (tự động) | Hệ thống tính báo giá | 18.500.000 − 555.000 + 800.000 = **18.745.000 đ**, cọc **5.624.000 đ** |
+| T08 | khach1 | Chọn lịch hẹn, bấm chốt đơn | Cổng chốt đơn → T09 |
+| T09 | (tự động) | Hệ thống lưu đơn, giữ hàng | Đơn có mã dạng VV-...-0001, trạng thái thành công |
+| Sau T09 | khach1 | Mở đơn, bấm "Tạo mã QR chuyển khoản" | Mã VietQR số tiền 5.624.000 đ, nội dung có mã đơn |
 
-## 2. Cấu trúc mã nguồn
+### Kịch bản phụ
+- **Chặn giảm vượt hạn mức:** ở T05, nhân viên nhập giảm 7% → báo lỗi vượt hạn mức 5%, không lưu.
+- **Khách không chốt:** ở T08, khách chọn không chốt → đơn kết thúc, không giữ hàng.
+
+## 2. Chạy trên máy
+
+1. Cài **Node.js bản 22.13 trở lên** tại https://nodejs.org. Kiểm tra bằng lệnh `node -v`.
+2. Tải mã nguồn (nút **Code → Download ZIP** trên trang này, hoặc clone kho), mở thư mục `vangvida-app` bằng VS Code.
+3. Mở terminal (**Terminal → New Terminal**) và gõ:
+   npm start
+   
+4. Mở trình duyệt vào **http://localhost:3000**. Dừng máy chủ: bấm `Ctrl + C` trong terminal.
+
+Ứng dụng không cần cài thêm thư viện. Lần chạy đầu tự tạo tệp dữ liệu `data/vangvida.db` cùng tài khoản và sản phẩm mẫu.
+
+**Nếu PowerShell báo lỗi "running scripts is disabled":** gõ `npm.cmd start` thay cho `npm start`, hoặc đổi terminal sang Command Prompt.
+
+**Muốn làm lại dữ liệu từ đầu:** gõ `npm run reset-db`.
+
+**Bật AI thật cho bước T02 (tùy chọn):** sao chép `.env.example` thành `.env`, điền `ANTHROPIC_API_KEY=...`, chạy lại `npm start`. Không có khóa thì T02 gợi ý theo luật dự phòng, ứng dụng vẫn chạy đầy đủ. Không bao giờ commit tệp `.env` lên Git.
+
+## 3. Kiểm thử tự động
 
 ```
-server.js          Máy chủ web + định tuyến API
-src/config.js      Cấu hình, tham số nghiệp vụ (hạn mức giảm 5%, cọc 30%, ngưỡng AI 0,6)
-src/db.js          Lược đồ cơ sở dữ liệu SQLite + dữ liệu mẫu
-src/auth.js        Đăng nhập: băm mật khẩu scrypt, phiên, chống dò mật khẩu
-src/rules.js       Luật nghiệp vụ dạng hàm thuần (báo giá, giảm giá, giờ xưởng, các cổng XOR)
-src/ai.js          T02: gọi Claude API + luật dự phòng + lọc đầu ra AI
-src/payment.js     Tích hợp VietQR: tạo mã QR chuyển khoản cho đơn đã chốt
-src/process.js     Động cơ quy trình: chạy đơn qua T01–T09 đúng mô hình TO-BE
-public/            Giao diện: Giaodientrangchu.html (trang chủ), app.js, style.css
-tests/             Kiểm thử tự động (30 test)
-data/vangvida.db   File cơ sở dữ liệu (tự tạo khi chạy lần đầu)
+npm test
 ```
 
-## 3. Ánh xạ BPMN → tính năng
+Chạy 30 test: luật nghiệp vụ, động cơ quy trình, phân quyền theo lane, API, đăng ký, lưu trữ và hai tích hợp bên ngoài. Kết quả mong đợi: 30/30 đạt.
 
-| Phần tử BPMN | Loại | Trong ứng dụng |
-|---|---|---|
-| T01 Cung cấp nhu cầu | User task (KH) | Màn hình “Tạo yêu cầu tư vấn” → `POST /api/orders` |
-| T02 AI gợi ý mẫu | Service task | `src/ai.js` → `recommend()`; chạy lại: `POST /api/orders/:id/ai-suggest` |
-| T03 Kiểm tra gợi ý, đo ni | User task (NV) | Màn hình chọn mẫu → `POST /api/orders/:id/tasks/T03` |
-| T04 Thử mẫu, đề nghị giảm | User task (KH) | `POST /api/orders/:id/tasks/T04` |
-| T05 Xét giảm ≤ 5% | User task (NV) | `POST /api/orders/:id/tasks/T05`, luật `validateDiscount()` |
-| T06 Xác nhận phí, hạn | User task (TH) | `POST /api/orders/:id/tasks/T06`, luật `validateDeadline()` |
-| T07 Tính báo giá | Business rule task | `calcQuote()` chạy tự động |
-| T08 Chốt đơn | User task (KH) | `POST /api/orders/:id/tasks/T08` |
-| T09 Lưu đơn, giữ hàng | Service task | `runT09()`: cấp mã đơn, tăng `products.reserved` |
-| Cổng “Khách yêu cầu giảm giá?” | XOR | `gateways.GDiscount` (yeuCauGiamGia) |
-| Cổng “Cần gia công thêm?” | XOR | `gateways.GQuoteCustom` (coGiaCong) |
-| Cổng “Khách chốt đơn?” | XOR | `gateways.GAccept` (khachChapThuan) |
-| Lane Khách / Nhân viên / Gia công | Lane | Vai trò đăng nhập `khach` / `nhanvien` / `tho`; máy chủ chặn sai lane (HTTP 403) |
-| Lane Hệ thống & AI | Lane | Các service task tự chạy trong `runAuto()` |
-| Đối tượng dữ liệu “Báo giá”, “Đơn POS” | Data object | Các cột báo giá và bảng `orders` |
+## 4. Cấu trúc mã nguồn
 
-Ngoài phạm vi: T10–T22 (cọc, gia công, thanh toán, bàn giao). Sau T09 đơn chuyển trạng thái `CHO_COC` hoặc `CHO_GIAO`.
+```
+server.js          Máy chủ web và các API
+src/config.js      Tham số nghiệp vụ: giảm tối đa 5%, cọc 30%, ngưỡng AI 0,6, giờ làm 08:00–18:00
+src/rules.js       Luật nghiệp vụ: tính báo giá, kiểm tra giảm giá, hạn gia công, ba cổng XOR
+src/process.js     Động cơ quy trình: đưa đơn qua T01–T09 đúng mô hình TO-BE
+src/auth.js        Đăng nhập, đăng ký, mã hóa mật khẩu, chống dò mật khẩu
+src/db.js          Cơ sở dữ liệu SQLite: 6 bảng và dữ liệu mẫu
+src/ai.js          T02: gọi Claude API, luật dự phòng, lọc kết quả AI
+src/payment.js     Tạo mã VietQR chuyển khoản cho đơn đã chốt
+public/            Giao diện: Giaodientrangchu.html, app.js, style.css
+tests/             Kiểm thử tự động
+docs/              Mô hình BPMN AS-IS, TO-BE và ảnh mô hình
+```
 
-## 4. Đáp ứng 6 yêu cầu kỹ thuật (mục 4.1)
+Mỗi tệp trong `src/` có chú thích tiếng Việt giải thích từng đoạn mã.
+
+## 5. Đáp ứng 6 yêu cầu kỹ thuật
 
 | Yêu cầu | Cách đáp ứng |
 |---|---|
-| Xác thực ≥ 3 vai trò | Đăng nhập thật, khách tự đăng ký (`POST /api/register`, luôn mang vai trò khách), mật khẩu băm scrypt, phiên lưu trong bảng `sessions`, cookie HttpOnly |
-| ≥ 3 luồng phê duyệt XOR | 3 cổng: giảm giá, gia công, chốt đơn |
-| Lưu trữ bền vững | SQLite, file `data/vangvida.db` |
-| ≥ 1 tích hợp bên ngoài | VietQR tạo mã QR chuyển khoản sau T09 (không cần khóa) + Anthropic Claude API cho T02 (khóa cất trong `.env`) |
-| Bộ kiểm thử tự động | `npm test` — 30 test: luật, quy trình, phân quyền, API, đăng ký, lưu trữ, 2 tích hợp |
-| ≥ 15 commit Git | Nhóm tự thực hiện — xem gợi ý mục 6 |
+| Xác thực ≥ 3 vai trò | Khách, nhân viên, thợ; mỗi vai trò ứng với một lane BPMN, máy chủ chặn thao tác sai lane (lỗi 403) |
+| ≥ 3 cổng XOR | “Khách yêu cầu giảm giá?”, “Cần gia công thêm?”, “Khách chốt đơn?” (`src/rules.js`) |
+| Lưu trữ bền vững | SQLite, tệp `data/vangvida.db`; tắt máy chủ mở lại dữ liệu vẫn còn |
+| ≥ 1 tích hợp bên ngoài | VietQR tạo mã chuyển khoản (không cần khóa); Claude API gợi ý mẫu ở T02 (cần khóa) |
+| Bộ kiểm thử tự động | 30 test, chạy bằng `npm test` |
+| ≥ 15 commit Git | Xem lịch sử commit của kho này |
 
-## 5. Bảo mật đã áp dụng
-- Mật khẩu băm scrypt có salt, so sánh an toàn thời gian; khóa đăng nhập 10 phút sau 5 lần sai.
-- Kiểm tra quyền và luật ở **máy chủ**, không tin giao diện.
-- Câu lệnh SQL dùng tham số (chống SQL injection); giao diện escape dữ liệu (chống XSS); header CSP.
-- POST bắt buộc header `X-Requested-With` + cookie SameSite=Strict (chống CSRF).
-- Giới hạn kích thước dữ liệu gửi lên; chặn đọc file ngoài thư mục `public`.
-- Khóa API chỉ ở `.env` phía máy chủ; AI không được đặt giá, đầu ra AI được lọc.
-- Đăng ký bị giới hạn 10 lần / 10 phút mỗi địa chỉ IP; trường “role” gửi lên bị bỏ qua nên không tự nâng quyền được.
-- Hạn chế còn lại: chưa có HTTPS (chạy cục bộ), mật khẩu demo dùng chung, chưa có trang đổi mật khẩu.
+Ánh xạ đầy đủ từ mô hình BPMN sang màn hình, API và phân quyền có trong báo cáo, mục 3.3.3.
 
-## 6. Làm việc với Git (≥ 15 commit)
-Thầy chấm “quá trình làm việc”, nên commit cần phản ánh công việc thật theo thời gian: mỗi khi nhóm sửa, thêm hoặc kiểm thử một phần thì commit một lần, mỗi thành viên commit phần mình làm. Không nên dồn 15 commit vào vài phút.
+## 6. Bảo mật
 
-Cách làm bằng giao diện VS Code (không cần gõ lệnh):
-1. Cài Git: https://git-scm.com → Download for Windows, cài với lựa chọn mặc định, rồi tắt và mở lại VS Code.
-2. Lần đầu, mở terminal và khai báo tên (mỗi người một lần trên máy mình):
-   `git config --global user.name "Ho Ten"` và `git config --global user.email "email@example.com"`
-3. Bấm biểu tượng **Source Control** (hình nhánh cây) ở thanh trái → **Initialize Repository**.
-4. Viết nội dung commit vào ô Message, ví dụ “Khởi tạo dự án: mã nguồn ứng dụng T01–T09”, bấm **Commit** (chọn Yes nếu hỏi stage all).
-5. Mỗi lần sửa xong một việc: vào Source Control, xem file thay đổi, ghi nội dung rõ ràng, bấm Commit.
-6. Muốn cả nhóm cùng làm và nộp đường link: tạo kho trên GitHub, bấm **Publish Branch** trong Source Control.
+- Mật khẩu băm bằng scrypt có salt; khóa đăng nhập 10 phút sau 5 lần sai.
+- Mọi kiểm tra quyền và luật nằm ở máy chủ, không tin giao diện.
+- Chống SQL injection (câu lệnh có tham số), XSS (escape dữ liệu, header CSP) và CSRF (header riêng, cookie SameSite=Strict).
+- Khóa API chỉ nằm ở `.env` phía máy chủ hoặc mục Environment trên Render, không có trong kho Git.
+- AI chỉ xếp hạng mẫu; giá, tồn kho và mức giảm luôn lấy từ dữ liệu hoặc do người xác nhận.
 
-Gợi ý các việc tự nhiên tạo ra commit trong thời gian còn lại: sửa giao diện theo ý nhóm; đổi dữ liệu sản phẩm cho sát thực tế; khai báo tài khoản VietQR; chỉnh câu chữ các màn hình; thêm test cho trường hợp nhóm phát hiện; sửa lỗi khi chạy thử; cập nhật README và tài liệu; chụp kết quả kiểm thử. Mỗi việc là một commit.
+Hạn chế còn lại: mật khẩu demo dùng chung, chưa có trang đổi mật khẩu; bản chạy trên máy dùng HTTP (bản Render có HTTPS).
