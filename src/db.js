@@ -5,6 +5,8 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const { hashPassword } = require("./auth");
 
+// Lược đồ 6 bảng: users (tài khoản), sessions (phiên đăng nhập), products (sản phẩm),
+// orders (đơn tư vấn), ai_suggestions (gợi ý của AI), order_history (nhật ký từng bước của đơn).
 const SCHEMA = `
 PRAGMA foreign_keys = ON;
 
@@ -108,6 +110,7 @@ const SEED_USERS = [
 ];
 const DEMO_PASSWORD = "vangvida123";
 
+// Mở (hoặc tạo mới) tệp cơ sở dữ liệu, tạo bảng nếu chưa có, rồi nạp dữ liệu mẫu.
 function openDb(file) {
   if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
@@ -116,6 +119,7 @@ function openDb(file) {
   return db;
 }
 
+// Chỉ nạp dữ liệu mẫu khi bảng còn trống, nên chạy lại máy chủ không bị nhân đôi dữ liệu.
 function seed(db) {
   const hasProducts = db.prepare("SELECT COUNT(*) AS n FROM products").get().n;
   if (!hasProducts) {
@@ -130,6 +134,7 @@ function seed(db) {
 }
 
 // Chạy nhiều câu lệnh như một giao dịch: lỗi giữa chừng thì hoàn tác toàn bộ
+// Ví dụ ở T09: cấp mã đơn và giữ hàng phải cùng thành công.
 function tx(db, fn) {
   db.exec("BEGIN");
   try { const r = fn(); db.exec("COMMIT"); return r; }
